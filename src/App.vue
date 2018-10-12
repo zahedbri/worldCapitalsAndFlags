@@ -12,6 +12,7 @@
   </h1>
   <hr>
 <img class="flags" :src="flags">
+<hr>
 <div id="map" ></div>
   <v-alert class="alerts" :value="showError" type="error" transition="scale-transition"> {{error}}
   </v-alert>
