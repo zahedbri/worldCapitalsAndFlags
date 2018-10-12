@@ -1,15 +1,15 @@
-import Vue from 'vue'
-import App from './App.vue'
-import Vuetify from 'vuetify'
-import 'vuetify/dist/vuetify.min.css'
-import Loading from 'vue-loading-overlay';
-import 'vue-loading-overlay/dist/vue-loading.css';
+import Vue from "vue";
+import App from "./App.vue";
+import Vuetify from "vuetify";
+import "vuetify/dist/vuetify.min.css";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
+import "babel-polyfill";
 
-
-Vue.use(Loading)
-Vue.use(Vuetify)
+Vue.use(Loading);
+Vue.use(Vuetify);
 
 new Vue({
-  el: '#app',
+  el: "#app",
   render: h => h(App)
-})
+});

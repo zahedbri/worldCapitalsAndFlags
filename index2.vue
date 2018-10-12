@@ -3,16 +3,16 @@
    <v-container class="container_form">
      <h1 style="text-align: center">World Capitals and flags</h1>
      <v-form ref="form" >
-    <v-select v-model="select"  @change=" capitalsRefill" :items="countries" :rules="[v => !!v || 'select one']" label="countries" required>
+    <v-select v-model="select" :items="countries" :rules="[v => !!v || 'select one']" label="countries" required>
     </v-select>
+    <v-layout row wrap>
+    <v-flex  xs6><v-btn @click=" capitalsRefill" >Generar capital</v-btn>
+      </v-flex>
+    </v-layout>
   </v-form>
-  <h1>Country: {{select}}</h1>
-  <hr>
-  <h1>Capital: {{capitals[0]}}
+  <h1>capital: {{capitals}}
   </h1>
-  <hr>
 <img class="flags" :src="flags">
-<div id="map" ></div>
   <v-alert class="alerts" :value="showError" type="error" transition="scale-transition"> {{error}}
   </v-alert>
    </v-container>
@@ -25,23 +25,24 @@ export default {
   name: "app",
   data() {
     return {
-      lat: null,
-      lng: null,
       error: null,
       showError: false,
       select: null,
       countries: [],
       API_DATA: [],
-      capitals: [],
+      capitals: null,
       flags: "../src/assets/download.png",
       elements: null,
-      COUNTRIES_API: "https://restcountries.eu/rest/v2/all"
+      COUNTRIES_API: "https://restcountries.eu/rest/v2/all",
+      CITIES_API: `https://restcountries.eu/rest/v2/name/${
+        this.select
+      }?fullText=true`
     };
   },
-  async created() {
-    try {
-      await this.countriesRefill();
-    } catch (e) {}
+  created() {
+    this.countriesRefill()
+      .then(console.log)
+      .catch(console.log);
   },
   methods: {
     showErrors() {
@@ -58,23 +59,24 @@ export default {
         this.countriesLoop();
       } catch (error) {
         alert(error.message);
+        this.showError();
       }
     },
     async capitalsRefill() {
       try {
-        this.capitals = [];
-        let capitalsRefill = (await axios.get(
-          `https://restcountries.eu/rest/v2/name/${this.select}?fullText=true`
-        )).data;
+        let loader = this.$loading.show();
+        this.capitals = "";
+        let capitalsRefill = (await axios.get(this.CITIES_API)).data;
         if (!capitalsRefill) {
           alert("no se ha encontrado una capital");
           return;
         }
         this.elements = capitalsRefill;
         this.citiesLoop();
-        this.initMap();
+        loader.hide();
       } catch (error) {
         alert(error.message);
+        this.showError();
       }
     },
     countriesLoop() {
@@ -86,14 +88,6 @@ export default {
       this.elements.forEach(countrySelected => {
         this.capitals.push(countrySelected.capital);
         this.flags = countrySelected.flag;
-        this.lat = countrySelected.latlng[0];
-        this.lng = countrySelected.latlng[1];
-      });
-    },
-    initMap() {
-      var map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: this.lat, lng: this.lng },
-        zoom: 7
       });
     }
   }
@@ -113,17 +107,7 @@ export default {
   border: gray solid 1px;
 }
 .flags {
-  width: 530px;
-  height: 300px;
-}
-#map {
-  height: 30%;
-}
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
+  width: 300px;
+  height: 200px;
 }
 </style>
-
